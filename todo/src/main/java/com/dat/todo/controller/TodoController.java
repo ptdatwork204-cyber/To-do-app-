@@ -44,12 +44,14 @@ public class TodoController {
     String priority = body.get("priority");
     String dueDate = body.get("dueDate");
     String repeatType = body.get("repeatType");
+    String category = body.get("category");
 
     service.addTodo(
         title,
         priority,
         dueDate,
         repeatType,
+        category,
         userId
     );
 }

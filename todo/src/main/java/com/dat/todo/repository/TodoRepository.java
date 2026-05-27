@@ -44,7 +44,9 @@ public class TodoRepository {
                 rs.getString("deleted_at"),
                 rs.getString("priority"),
                 rs.getString("due_date"),
-                rs.getString("repeat_type")
+                rs.getString("repeat_type"),
+                rs.getString("category"),
+                rs.getString("next_activation_at")
                 ));
             }
         }
@@ -57,9 +59,10 @@ public class TodoRepository {
         String priority,
         String dueDate,
         String repeatType,
+        String category,
         int userId
         ) throws SQLException {
-        String sql = "INSERT INTO todos (title, completed, user_id, priority, due_date, repeat_type) VALUES (?, false, ?, ?, ?, ?)";
+        String sql = "INSERT INTO todos (title, completed, user_id, priority, due_date, repeat_type, category, next_activation_at) VALUES (?, false, ?, ?, ?, ?, ?, ?)";
 
         try (
             Connection conn = dataSource.getConnection();
@@ -82,6 +85,7 @@ public class TodoRepository {
             );
         }
             ps.setString(5, repeatType);
+            ps.setString(6, category);
             ps.executeUpdate();
         }
     }
@@ -187,7 +191,8 @@ public class TodoRepository {
                 rs.getString("deleted_at"),
                 rs.getString("priority"),
                 rs.getString("due_date"),
-                rs.getString("repeat_type")
+                rs.getString("repeat_type"),
+                rs.getString("category")
             );
         }
 

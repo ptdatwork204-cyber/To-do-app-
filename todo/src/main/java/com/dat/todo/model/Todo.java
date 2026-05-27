@@ -11,6 +11,8 @@ public class Todo {
     private String priority;
     private String dueDate;
     private String repeatType;
+    private String category;
+    private String nextActivationAt;
 
     // constructor
     public Todo(
@@ -22,7 +24,9 @@ public class Todo {
         String deletedAt,
         String priority,
         String dueDate,
-        String repeatType
+        String repeatType,
+        String category,
+        String nextActivationAt 
     ) {
 
         this.id = id;
@@ -34,6 +38,8 @@ public class Todo {
         this.priority = priority;
         this.dueDate = dueDate;
         this.repeatType = repeatType;
+        this.category = category;
+        this.nextActivationAt = nextActivationAt;
     }
 
     // default constructor
@@ -109,5 +115,19 @@ public class Todo {
 
     public void setRepeatType(String repeatType) {
         this.repeatType = repeatType;
+    }
+    public String getCategory() {
+        return category;
+    }
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public String getNextActivationAt() {
+        return nextActivationAt;
+    }
+
+    public void setNextActivationAt(String nextActivationAt) {
+        this.nextActivationAt = nextActivationAt;
     }
 }
