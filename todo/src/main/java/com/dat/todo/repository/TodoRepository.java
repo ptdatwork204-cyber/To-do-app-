@@ -60,6 +60,7 @@ public class TodoRepository {
         String dueDate,
         String repeatType,
         String category,
+        String nextActivationAt,
         int userId
         ) throws SQLException {
         String sql = "INSERT INTO todos (title, completed, user_id, priority, due_date, repeat_type, category, next_activation_at) VALUES (?, false, ?, ?, ?, ?, ?, ?)";
@@ -86,6 +87,7 @@ public class TodoRepository {
         }
             ps.setString(5, repeatType);
             ps.setString(6, category);
+            ps.setString(7, nextActivationAt);  
             ps.executeUpdate();
         }
     }
@@ -192,7 +194,8 @@ public class TodoRepository {
                 rs.getString("priority"),
                 rs.getString("due_date"),
                 rs.getString("repeat_type"),
-                rs.getString("category")
+                rs.getString("category"),
+                rs.getString("next_activation_at")
             );
         }
 
@@ -234,7 +237,7 @@ public class TodoRepository {
 }
     public String getEmailById(int userId) throws SQLException {
     String sql = "SELECT email FROM users WHERE id = ?";
-
+        
     try (
         Connection conn = dataSource.getConnection();
         PreparedStatement ps = conn.prepareStatement(sql)
