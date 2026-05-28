@@ -38,7 +38,7 @@ public class TodoService {
             int userId
     ) throws SQLException {
 
-        repo.save(title, priority, dueDate, repeatType, category, userId);
+        repo.save(title, priority, dueDate, repeatType, category, null, userId);
 
         String details = String.format("Priority: %s, Due: %s, Repeat: %s, Category: %s",
             priority, dueDate != null && !dueDate.isEmpty() ? dueDate : "None",
@@ -95,6 +95,7 @@ public class TodoService {
                 nextDate,
                 repeatType,
                 todo.getCategory(),
+                null,
                 userId
         );
     }
