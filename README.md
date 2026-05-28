@@ -1,4 +1,4 @@
-<<<<<<<< HEAD
+
 # To-do-app-
 Small personal to-do-app project
 =======
@@ -481,4 +481,3 @@ This project was built to practice:
 # Author
 
 Developed by Me.
->>>>>>> master
