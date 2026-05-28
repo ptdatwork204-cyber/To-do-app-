@@ -470,4 +470,18 @@ getUpcomingTodos() throws SQLException {
             ps.executeUpdate();
         }
     }
+
+    public void updatePriority(int id, String priority, int userId) throws SQLException {
+        String sql = "UPDATE todos SET priority = ? WHERE id = ? AND user_id = ?";
+
+        try (
+            Connection conn = dataSource.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql)
+        ) {
+            ps.setString(1, priority);
+            ps.setInt(2, id);
+            ps.setInt(3, userId);
+            ps.executeUpdate();
+        }
+    }
 }

@@ -2,9 +2,11 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { useTheme } from "../context/ThemeContext";
 
 export default function Register() {
   const navigate = useNavigate();
+  const { darkMode, toggleDarkMode } = useTheme();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -25,12 +27,12 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="bg-white p-6 rounded-2xl shadow-lg w-80">
-        <h1 className="text-2xl font-bold mb-4">Register</h1>
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900">
+      <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg w-80">
+        <h1 className="text-2xl font-bold mb-4 dark:text-white">Register</h1>
 
         <input
-          className="w-full border p-2 rounded mb-3"
+          className="w-full border p-2 rounded mb-3 dark:bg-gray-700 dark:text-white dark:border-gray-600"
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
@@ -38,7 +40,7 @@ export default function Register() {
 
         <input
           type="password"
-          className="w-full border p-2 rounded mb-3"
+          className="w-full border p-2 rounded mb-3 dark:bg-gray-700 dark:text-white dark:border-gray-600"
           placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
@@ -51,12 +53,21 @@ export default function Register() {
           Create Account
         </button>
 
-        <p className="mt-3 text-sm text-center">
+        <p className="mt-3 text-sm text-center dark:text-white">
           Already have an account?{" "}
           <Link to="/login" className="text-blue-500">
             Login
           </Link>
         </p>
+
+        {/* Dark Mode Toggle */}
+        <button
+          onClick={toggleDarkMode}
+          className="mt-4 w-full text-center text-gray-500 dark:text-gray-400 text-sm"
+        >
+          {darkMode ? "☀️ Switch to Light Mode" : "🌙 Switch to Dark Mode"}
+        </button>
+
       </div>
     </div>
   );

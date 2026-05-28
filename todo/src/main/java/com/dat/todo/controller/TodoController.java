@@ -73,16 +73,22 @@ public class TodoController {
     @PutMapping("/{id}")
     public void updateTodo(
         @PathVariable int id,
-        @RequestBody Map<String, Boolean> body,
+        @RequestBody Map<String, Object> body,
         @RequestHeader("Authorization") String authHeader
     ) throws SQLException {
 
         String token = authHeader.replace("Bearer ", "");
         int userId = JwtUtil.extractUserId(token);
 
-        boolean completed = body.get("completed");
+        if (body.containsKey("completed")) {
+            boolean completed = (Boolean) body.get("completed");
+            service.updateTodo(id, completed, userId);
+        }
 
-        service.updateTodo(id, completed, userId);
+        if (body.containsKey("priority")) {
+            String priority = (String) body.get("priority");
+            service.updatePriority(id, priority, userId);
+        }
     }
 
     // GET user info

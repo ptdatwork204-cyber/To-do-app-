@@ -15,10 +15,12 @@ import java.time.LocalDateTime;
 public class TodoService {
 
     private final TodoRepository repo;
+    private final ActivityService activityService;
     private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
-    public TodoService(TodoRepository repo) {
+    public TodoService(TodoRepository repo, ActivityService activityService) {
         this.repo = repo;
+        this.activityService = activityService;
     }
 
     // GET TODOS
@@ -37,23 +39,42 @@ public class TodoService {
     ) throws SQLException {
 
         repo.save(title, priority, dueDate, repeatType, category, userId);
+
+        String details = String.format("Priority: %s, Due: %s, Repeat: %s, Category: %s",
+            priority, dueDate != null && !dueDate.isEmpty() ? dueDate : "None",
+            repeatType, category);
+        activityService.logActivity(userId, "TASK_CREATED", title, null, details);
     }
 
     // DELETE TODO
     public void deleteTodo(int id, int userId) throws SQLException {
+        Todo todo = repo.findById(id);
+        String title = todo.getTitle();
+
         repo.delete(id, userId);
+
+        activityService.logActivity(userId, "TASK_DELETED", title, id, "Task deleted");
     }
 
     // UPDATE TODO (FIXED SAFE VERSION)
     public void updateTodo(int id, boolean completed, int userId) throws SQLException {
 
+        Todo oldTodo = repo.findById(id);
+        String oldTitle = oldTodo.getTitle();
+        String oldPriority = oldTodo.getPriority();
+
         repo.updateStatus(id, completed, userId);
+
+        if (completed) {
+            activityService.logActivity(userId, "TASK_COMPLETED", oldTitle, id, "Task marked as completed");
+        } else {
+            activityService.logActivity(userId, "TASK_UNCOMPLETED", oldTitle, id, "Task marked as incomplete");
+        }
 
         if (!completed) return;
 
         Todo todo = repo.findById(id);
 
-        // SAFE NULL CHECK (IMPORTANT)
         String repeatType = todo.getRepeatType();
 
         if (repeatType == null || repeatType.equals("NONE")) {
@@ -62,7 +83,6 @@ public class TodoService {
 
         String dueDate = todo.getDueDate();
 
-        // SAFE NULL CHECK FOR DATE
         String nextDate = null;
 
         if (dueDate != null && !dueDate.isEmpty()) {
@@ -79,10 +99,25 @@ public class TodoService {
         );
     }
 
+    // Update priority
+    public void updatePriority(int id, String priority, int userId) throws SQLException {
+        Todo todo = repo.findById(id);
+        String title = todo.getTitle();
+        String oldPriority = todo.getPriority();
+
+        repo.updatePriority(id, priority, userId);
+
+        activityService.logActivity(userId, "PRIORITY_CHANGED", title, id,
+            String.format("From %s to %s", oldPriority, priority));
+    }
+
     // AUTH
     public void register(String email, String password) throws SQLException {
         String hashed = encoder.encode(password);
         repo.createUser(email, hashed);
+
+        int userId = repo.findUserIdByEmail(email);
+        activityService.logActivity(userId, "USER_REGISTERED", null, null, "New user registered");
     }
 
     public int login(String email, String password) throws SQLException {
@@ -101,7 +136,11 @@ public class TodoService {
     }
 
     public void updateDisplayName(int userId, String name) throws SQLException {
+        String oldName = repo.getDisplayName(userId);
         repo.updateDisplayName(userId, name);
+
+        activityService.logActivity(userId, "PROFILE_UPDATED", null, null,
+            String.format("Display name changed from '%s' to '%s'", oldName, name));
     }
 
     public Map<String, String> getUserInfo(int userId) throws SQLException {

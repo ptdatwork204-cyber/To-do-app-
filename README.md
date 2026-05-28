@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+<<<<<<<< HEAD
 # To-do-app-
 Small personal to-do-app project
 =======
@@ -34,11 +34,13 @@ A fullstack Todo Management application built with:
 - Delete tasks
 - Complete tasks
 - Update task status
+- Update task priority inline
 
 ### Priority System
 - LOW
 - MEDIUM
 - HIGH
+- Inline priority change via dropdown
 
 ### Due Dates
 - Set deadline for tasks
@@ -53,6 +55,33 @@ Supported recurring modes:
 
 When a recurring task is completed:
 - a new task is automatically generated with the next due date
+
+---
+
+## Dark Mode
+- Toggle between light and dark themes
+- Persists user preference in localStorage
+- Available in Login, Register, Settings, Todo, and Admin pages
+- Accessible via sidebar and Settings page
+
+---
+
+## Activity Log (Admin)
+Admin users can track all user activities:
+- TASK_CREATED - When a new task is created
+- TASK_COMPLETED - When a task is marked complete
+- TASK_UNCOMPLETED - When a completed task is marked incomplete
+- TASK_DELETED - When a task is deleted
+- PRIORITY_CHANGED - When task priority is changed
+- PROFILE_UPDATED - When user updates their display name
+- USER_REGISTERED - When a new user registers
+
+Activity log includes:
+- Timestamp
+- User email and display name
+- Action type
+- Task title (if applicable)
+- Details
 
 ---
 
@@ -76,6 +105,7 @@ Admin users can:
 - see overdue tasks
 - view priorities
 - inspect completed/pending tasks
+- view activity log
 
 Dashboard statistics:
 - Total tasks
@@ -110,7 +140,7 @@ Dashboard statistics:
 
 # Project Structure
 
-```bash
+```
 todo/
 │
 ├── src/main/java/com/dat/todo
@@ -122,14 +152,17 @@ todo/
 │
 ├── service/
 │   ├── TodoService.java
+│   ├── ActivityService.java
 │   ├── EmailService.java
 │   └── ReminderScheduler.java
 │
 ├── repository/
-│   └── TodoRepository.java
+│   ├── TodoRepository.java
+│   └── ActivityRepository.java
 │
 ├── model/
-│   └── Todo.java
+│   ├── Todo.java
+│   └── Activity.java
 │
 ├── util/
 │   └── JwtUtil.java
@@ -162,9 +195,11 @@ Handles:
 - recurring task logic
 - analytics
 - email reminder logic
+- activity logging
 
 Examples:
 - `TodoService`
+- `ActivityService`
 - `ReminderScheduler`
 
 ---
@@ -177,6 +212,7 @@ Handles:
 
 Example:
 - `TodoRepository`
+- `ActivityRepository`
 
 ---
 
@@ -206,6 +242,18 @@ due_date
 repeat_type
 reminder_sent
 user_id
+```
+
+## activities (NEW)
+
+```sql
+id
+user_id
+action
+task_title
+todo_id
+details
+timestamp
 ```
 
 ---
@@ -240,6 +288,7 @@ PUT /api/todos/me
 ```http
 GET /api/admin/todos
 GET /api/admin/analytics
+GET /api/admin/activities?limit=100
 ```
 
 ---
@@ -350,6 +399,46 @@ resend.api.key=
 
 ---
 
+# Changes Made
+
+## Code Cleanup
+- Removed console.log debugging statements from TodoPage.jsx
+- Removed console.log from App.jsx
+
+## Dark Mode Implementation
+- Created ThemeContext.jsx for dark mode state management
+- Updated tailwind.config.js to enable dark mode with 'class' strategy
+- Updated all pages with dark mode classes:
+  - Login.jsx
+  - Register.jsx
+  - Layout.jsx
+  - TodoPage.jsx
+  - AdminPage.jsx
+  - Settings.jsx
+- Added dark mode toggle in sidebar and Settings page
+- Persists preference in localStorage
+
+## Activity Log Implementation
+- Created Activity.java model
+- Created ActivityRepository.java for database operations
+- Created ActivityService.java for business logic
+- Modified TodoService.java to log activities on:
+  - Task creation
+  - Task completion/incompletion
+  - Task deletion
+  - Priority change
+  - Profile update
+  - User registration
+- Added /api/admin/activities endpoint in AdminController
+- Updated AdminPage.jsx with Activity Log tab showing:
+  - Timestamp
+  - User info
+  - Action type with color coding
+  - Task title
+  - Details
+
+---
+
 # Future Improvements
 
 Planned features:
@@ -365,6 +454,10 @@ Planned features:
 - Refresh tokens
 - Rate limiting
 - Mobile responsive improvements
+- Export activity logs to CSV
+- Filter activity logs by date range
+- Filter activity logs by user
+- Notification preferences in settings
 
 ---
 
@@ -380,6 +473,8 @@ This project was built to practice:
 - Email systems
 - State management
 - Real-world application structure
+- Dark mode implementation
+- Activity logging and audit trails
 
 ---
 

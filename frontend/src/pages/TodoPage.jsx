@@ -2,10 +2,12 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { useTheme } from "../context/ThemeContext";
 
 function TodoPage() {
   const navigate = useNavigate();
   const { user, token } = useAuth();
+  const { darkMode } = useTheme();
 
   const [todos, setTodos] = useState([]);
   const [title, setTitle] = useState("");
@@ -20,7 +22,6 @@ function TodoPage() {
     Authorization: `Bearer ${token}`,
   });
 
-  // FETCH TODOS
   const fetchTodos = async () => {
     try {
       const res = await axios.get(API, {
@@ -34,7 +35,6 @@ function TodoPage() {
     }
   };
 
-  // ADD TODO
   const addTodo = async () => {
     if (!title.trim()) return;
 
@@ -66,7 +66,6 @@ function TodoPage() {
     }
   };
 
-  // DELETE TODO
   const deleteTodo = async (id) => {
     try {
       await axios.delete(`${API}/${id}`, {
@@ -80,7 +79,6 @@ function TodoPage() {
     }
   };
 
-  // TOGGLE TODO
   const toggleTodo = async (id, completed) => {
     try {
       await axios.put(
@@ -98,6 +96,23 @@ function TodoPage() {
     }
   };
 
+  const updatePriority = async (id, newPriority) => {
+    try {
+      await axios.put(
+        `${API}/${id}`,
+        { priority: newPriority },
+        {
+          headers: getAuthHeader(),
+        }
+      );
+
+      fetchTodos();
+    } catch (err) {
+      console.error(err);
+      alert("Failed to update priority");
+    }
+  };
+
   useEffect(() => {
     if (!token) {
       navigate("/login");
@@ -108,24 +123,21 @@ function TodoPage() {
   }, [token]);
 
   return (
-    <div className="min-h-screen bg-gray-100 flex justify-center">
-      <div className="w-full max-w-2xl mt-10 bg-white shadow-lg rounded-xl p-6">
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex justify-center">
+      <div className="w-full max-w-2xl mt-10 bg-white dark:bg-gray-800 shadow-lg rounded-xl p-6">
 
-        {/* TITLE */}
-        <h1 className="text-3xl font-bold text-center mb-2">
+        <h1 className="text-3xl font-bold text-center mb-2 dark:text-white">
           Todo App
         </h1>
 
-        {/* USER */}
-        <p className="text-center text-gray-600 mb-6">
+        <p className="text-center text-gray-600 dark:text-gray-300 mb-6">
           Welcome, {user?.displayName || user?.email}
         </p>
 
-        {/* ADD TODO */}
         <div className="space-y-3 mb-8">
 
           <input
-            className="w-full border rounded-lg px-3 py-2"
+            className="w-full border rounded-lg px-3 py-2 dark:bg-gray-700 dark:text-white dark:border-gray-600"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="Enter task"
@@ -136,7 +148,7 @@ function TodoPage() {
             <select
               value={priority}
               onChange={(e) => setPriority(e.target.value)}
-              className="border rounded-lg px-3 py-2"
+              className="border rounded-lg px-3 py-2 dark:bg-gray-700 dark:text-white dark:border-gray-600"
             >
               <option value="LOW">LOW</option>
               <option value="MEDIUM">MEDIUM</option>
@@ -146,7 +158,7 @@ function TodoPage() {
             <select
               value={repeatType}
               onChange={(e) => setRepeatType(e.target.value)}
-              className="border rounded-lg px-3 py-2"
+              className="border rounded-lg px-3 py-2 dark:bg-gray-700 dark:text-white dark:border-gray-600"
             >
               <option value="NONE">No Repeat</option>
               <option value="DAILY">Daily</option>
@@ -157,7 +169,7 @@ function TodoPage() {
             <select
               value={category}
               onChange={(e) => setCategory(e.target.value)}
-              className="border rounded-lg px-3 py-2"
+              className="border rounded-lg px-3 py-2 dark:bg-gray-700 dark:text-white dark:border-gray-600"
             >
               <option value="Work">Work</option>
               <option value="Study">Study</option>
@@ -168,7 +180,7 @@ function TodoPage() {
               type="datetime-local"
               value={dueDate}
               onChange={(e) => setDueDate(e.target.value)}
-              className="flex-1 border rounded-lg px-3 py-2"
+              className="flex-1 border rounded-lg px-3 py-2 dark:bg-gray-700 dark:text-white dark:border-gray-600"
             />
 
             <button
@@ -181,17 +193,9 @@ function TodoPage() {
           </div>
         </div>
 
-        {/* TODO LIST */}
         <ul className="space-y-3">
 
           {todos.map((t) => {
-
-            // ================= DEBUG =================
-            console.log("TODO:", t);
-            console.log("CATEGORY:", t.category);
-            console.log("CATEGORY RAW:", `[${t.category}]`);
-            console.log("TYPE:", typeof t.category);
-            // ========================================
 
             const isOverdue =
               t.dueDate &&
@@ -203,10 +207,9 @@ function TodoPage() {
             return (
               <li
                 key={t.id}
-                className="flex items-center justify-between border p-4 rounded-xl bg-white"
+                className="flex items-center justify-between border p-4 rounded-xl bg-white dark:bg-gray-700 dark:border-gray-600"
               >
 
-                {/* LEFT */}
                 <div className="flex items-start gap-3">
 
                   <input
@@ -223,14 +226,13 @@ function TodoPage() {
                     <p
                       className={
                         t.completed
-                          ? "line-through text-gray-400 font-medium"
-                          : "font-medium"
+                          ? "line-through text-gray-400 font-medium dark:text-gray-500"
+                          : "font-medium dark:text-white"
                       }
                     >
                       {t.title}
                     </p>
 
-                    {/* METADATA */}
                     <div className="flex flex-wrap gap-2 mt-2 text-sm">
 
                       <span
@@ -249,42 +251,43 @@ function TodoPage() {
                           : "Pending"}
                       </span>
 
-                      {/* PRIORITY */}
-                      <span
+                      <select
+                        value={t.priority}
+                        onChange={(e) => updatePriority(t.id, e.target.value)}
                         className={
                           t.priority === "HIGH"
-                            ? "bg-red-100 text-red-700 px-2 py-1 rounded-full text-xs"
+                            ? "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-200 px-2 py-1 rounded-full text-xs border-none cursor-pointer"
                             : t.priority === "MEDIUM"
-                            ? "bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full text-xs"
-                            : "bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs"
+                            ? "bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-200 px-2 py-1 rounded-full text-xs border-none cursor-pointer"
+                            : "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-200 px-2 py-1 rounded-full text-xs border-none cursor-pointer"
                         }
                       >
-                        {t.priority}
-                      </span>
+                        <option value="LOW">LOW</option>
+                        <option value="MEDIUM">MEDIUM</option>
+                        <option value="HIGH">HIGH</option>
+                      </select>
 
-                      {/* CATEGORY (FIXED) */}
                       <span
                         className={
                           category === "Work"
-                            ? "bg-red-100 text-red-700 px-2 py-1 rounded-full text-xs"
+                            ? "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-200 px-2 py-1 rounded-full text-xs"
                             : category === "Study"
-                            ? "bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-xs"
-                            : "bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs"
+                            ? "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-200 px-2 py-1 rounded-full text-xs"
+                            : "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-200 px-2 py-1 rounded-full text-xs"
                         }
                       >
                         {category || "No Category"}
                       </span>
 
-                      {/* REPEAT */}
                       {t.repeatType !== "NONE" && (
-                        <span className="bg-purple-100 text-purple-700 px-2 py-1 rounded-full text-xs">
+                        <span className="bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-200 px-2 py-1 rounded-full text-xs">
                           {t.repeatType}
                         </span>
                       )}
 
                     </div>
 
-                    <p className="text-sm text-gray-500 mt-2">
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
                       Due:{" "}
                       {t.dueDate
                         ? new Date(t.dueDate).toLocaleString()
@@ -294,7 +297,6 @@ function TodoPage() {
                   </div>
                 </div>
 
-                {/* DELETE */}
                 <button
                   onClick={() => deleteTodo(t.id)}
                   className="text-red-500 hover:text-red-700 font-medium"
